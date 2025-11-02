@@ -10,4 +10,4 @@ wheels/
 .venv
 
 # Other files
-app.log
+.env
