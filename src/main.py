@@ -10,7 +10,6 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-
     logger = logging.getLogger(__name__)
     logger.info("Application started")
 
@@ -27,5 +26,7 @@ if __name__ == "__main__":
 
     logger.info("Data split into training, validation, and test sets")
 
-    model_service = service_factory.get_model_service(input_shape=X_train.shape[1:], output_units=1)
+    model_service = service_factory.get_model_service(
+        input_shape=X_train.shape[1:], output_units=1
+    )
     model = model_service.build_model()

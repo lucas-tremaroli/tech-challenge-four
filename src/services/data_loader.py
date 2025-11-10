@@ -26,7 +26,7 @@ class DataLoader:
     def create_sequences(self, data_scaled: np.ndarray, seq_length: int = 60):
         X, y = [], []
         for i in range(len(data_scaled) - seq_length):
-            X.append(data_scaled[i:i + seq_length])
+            X.append(data_scaled[i : i + seq_length])
             y.append(data_scaled[i + seq_length])
         return np.array(X), np.array(y)
 

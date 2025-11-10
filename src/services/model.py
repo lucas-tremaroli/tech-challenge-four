@@ -16,6 +16,6 @@ class ModelService:
         model.add(Dropout(0.2))
         model.add(Dense(self.output_units))
 
-        model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
+        model.compile(optimizer="adam", loss="mean_squared_error", metrics=["mae"])
         model.summary()
         return model
