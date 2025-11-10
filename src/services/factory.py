@@ -1,4 +1,4 @@
-from src.services.data_loader import DataLoader
+from services.data_loader import DataLoader
 
 
 class ServiceFactory:
