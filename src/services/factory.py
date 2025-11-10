@@ -3,19 +3,17 @@ from services.data_loader import DataLoader
 
 
 class ServiceFactory:
-    def __init__(self):
-        self._data_loader_service = None
-        self._model_service = None
+    _data_loader_service = None
+    _model_service = None
 
-    def get_data_loader_service(self):
-        if self._data_loader_service is None:
-            self._data_loader_service = DataLoader()
-        return self._data_loader_service
+    @staticmethod
+    def get_data_loader_service():
+        if ServiceFactory._data_loader_service is None:
+            ServiceFactory._data_loader_service = DataLoader()
+        return ServiceFactory._data_loader_service
 
-    def get_model_service(self, input_shape, output_units):
-        if self._model_service is None:
-            self._model_service = ModelService(input_shape, output_units)
-        return self._model_service
-
-
-service_factory = ServiceFactory()
+    @staticmethod
+    def get_model_service(input_shape, output_units):
+        if ServiceFactory._model_service is None:
+            ServiceFactory._model_service = ModelService(input_shape, output_units)
+        return ServiceFactory._model_service
