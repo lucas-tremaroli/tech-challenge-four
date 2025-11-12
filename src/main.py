@@ -14,6 +14,5 @@ if __name__ == "__main__":
 
     data_loader = ServiceFactory.get_data_loader_service()
     scaled_data = data_loader.load_and_scale_data()
-    logger.info(scaled_data.head())
 
     logger.info("Application finished")
