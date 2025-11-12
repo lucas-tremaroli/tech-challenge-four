@@ -18,12 +18,12 @@ class ModelService:
         model.summary()
         return model
 
-    def train_model(self, model, X_train, y_train, epochs=20, batch_size=32):
+    def train_model(self, model, X_train, y_train):
         history = model.fit(
             X_train,
             y_train,
-            epochs=epochs,
-            batch_size=batch_size,
+            epochs=50,
+            batch_size=32,
             validation_split=0.2,
             shuffle=True,
             verbose=1,
