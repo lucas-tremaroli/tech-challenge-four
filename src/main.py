@@ -36,6 +36,6 @@ if __name__ == "__main__":
         y_train,
     )
     logger.info("Model training completed")
-    test_loss, test_mae = model.evaluate(X_test, y_test)
+    test_loss, test_mae = model_service.evaluate_model(model, X_test, y_test)
     logger.info(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
     logger.info("Application finished")

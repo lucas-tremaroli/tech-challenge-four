@@ -14,7 +14,6 @@ class ModelService:
         model.add(LSTM(50, return_sequences=False))
         model.add(Dropout(0.2))
         model.add(Dense(self.output_units))
-
         model.compile(optimizer="adam", loss="mean_squared_error", metrics=["mae"])
         model.summary()
         return model
@@ -30,3 +29,7 @@ class ModelService:
             verbose=1,
         )
         return history
+
+    def evaluate_model(self, model, X_test, y_test):
+        test_loss, test_mae = model.evaluate(X_test, y_test)
+        return test_loss, test_mae
