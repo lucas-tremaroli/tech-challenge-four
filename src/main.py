@@ -13,6 +13,8 @@ if __name__ == "__main__":
     logger.info("Application started")
 
     data_loader = ServiceFactory.get_data_loader_service()
-    scaled_data = data_loader.load_and_scale_data()
+    stock_data = data_loader.load_data()
+    scaled_data = data_loader.scale_data(stock_data)
+    X, y = data_loader.get_training_data(scaled_data)
 
     logger.info("Application finished")
