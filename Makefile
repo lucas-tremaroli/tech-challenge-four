@@ -18,3 +18,6 @@ format:
 
 run:
 	uv run src/main.py
+
+clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} +
