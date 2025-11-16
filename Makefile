@@ -1,4 +1,4 @@
-.PHONY: help db lint format run
+.PHONY: help db lint format run clean
 
 help:
 	@echo "Available commands:"
@@ -6,6 +6,7 @@ help:
 	@echo "  make lint    - Lint the codebase using ruff"
 	@echo "  make format  - Format the codebase using ruff"
 	@echo "  make run     - Run the main application"
+	@echo "  make clean   - Remove __pycache__ directories"
 
 db:
 	duckdb src/data/aapl.db
