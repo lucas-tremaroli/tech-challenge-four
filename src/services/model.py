@@ -1,13 +1,15 @@
+import logging
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 
 
 class ModelService:
-    def __init__(self, input_shape, output_units):
-        self.input_shape = input_shape
-        self.output_units = output_units
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.input_shape = (60, 12)  # timesteps, features (12 features from scaled data)
+        self.output_units = 12  # output units matching number of features
 
-    def build_model(self):
+    def build(self) -> Sequential:
         model = Sequential()
         model.add(LSTM(50, return_sequences=True, input_shape=self.input_shape))
         model.add(Dropout(0.2))
@@ -18,7 +20,7 @@ class ModelService:
         model.summary()
         return model
 
-    def train_model(self, model, X_train, y_train):
+    def train(self, model, X_train, y_train):
         history = model.fit(
             X_train,
             y_train,
@@ -30,6 +32,7 @@ class ModelService:
         )
         return history
 
-    def evaluate_model(self, model, X_test, y_test):
-        test_loss, test_mae = model.evaluate(X_test, y_test)
-        return test_loss, test_mae
+    def evaluate(self, model, X_test, y_test):
+        evaluation = model.evaluate(X_test, y_test, verbose=1)
+        self.logger.info(f"Test Loss: {evaluation[0]}, Test MAE: {evaluation[1]}")
+        return evaluation

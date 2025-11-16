@@ -17,4 +17,9 @@ if __name__ == "__main__":
     scaled_data = data_loader.scale_data(stock_data)
     X, y = data_loader.get_training_data(scaled_data)
 
+    model_service = ServiceFactory.get_model_service()
+    lstm_model = model_service.build()
+    model_service.train(lstm_model, X, y)
+    model_service.evaluate(lstm_model, X, y)
+
     logger.info("Application finished")

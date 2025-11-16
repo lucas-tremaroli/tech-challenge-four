@@ -2,10 +2,8 @@ import logging
 import pandas as pd
 import pandas_ta as ta
 
-logger = logging.getLogger(__name__)
 
-
-class TechnicalIndicators:
+class TechnicalIndicatorsService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 

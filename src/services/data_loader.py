@@ -5,10 +5,8 @@ import yfinance as yf
 from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler
 
-logger = logging.getLogger(__name__)
 
-
-class DataLoader:
+class DataLoaderService:
     def __init__(self, technical_indicators=None):
         self.logger = logging.getLogger(__name__)
         self.db_file = "src/data/aapl.db"
@@ -27,12 +25,12 @@ class DataLoader:
         """
         Load stock data from DuckDB database.
         """
-        logger.info(f"Loading data from {self.db_file}, table: {self.db_table}")
+        self.logger.info(f"Loading data from {self.db_file}, table: {self.db_table}")
         with duckdb.connect(self.db_file) as db_con:
             data = db_con.table(self.db_table).to_df()
 
         if include_indicators and self.technical_indicators:
-            logger.info("Adding technical indicators to the data")
+            self.logger.info("Adding technical indicators to the data")
             data = self.technical_indicators.add_all_indicators(data)
 
         return data
@@ -48,7 +46,7 @@ class DataLoader:
         numeric_columns = data.select_dtypes(include=[np.number]).columns.tolist()
         numeric_columns = [col for col in numeric_columns if col not in exclude_columns]
 
-        logger.info(f"Scaling columns: {numeric_columns}")
+        self.logger.info(f"Scaling columns: {numeric_columns}")
 
         # Drop rows with NaN values (from technical indicators) before scaling
         data_clean = data[numeric_columns].dropna()
@@ -61,7 +59,7 @@ class DataLoader:
         """
         Create sequences of data for time series forecasting.
         """
-        logger.info(f"Creating sequences with lookback period: {lookback}")
+        self.logger.info(f"Creating sequences with lookback period: {lookback}")
         X, y = [], []
         for i in range(len(data_scaled) - lookback):
             X.append(data_scaled[i : i + lookback])
@@ -72,6 +70,6 @@ class DataLoader:
         """
         Prepare training data for the model.
         """
-        logger.info("Preparing training data")
+        self.logger.info("Preparing training data")
         X, y = self.create_sequences(data_scaled, lookback)
         return X, y
