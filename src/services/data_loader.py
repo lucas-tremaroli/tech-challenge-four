@@ -4,6 +4,7 @@ import numpy as np
 import yfinance as yf
 from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
 
 
 class DataLoaderService:
@@ -70,6 +71,9 @@ class DataLoaderService:
         """
         Prepare training data for the model.
         """
-        self.logger.info("Preparing training data")
         X, y = self.create_sequences(data_scaled, lookback)
-        return X, y
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, shuffle=False
+        )
+        self.logger.info(f"Training data shape: {X_train.shape}, Test data shape: {X_test.shape}")
+        return X_train, X_test, y_train, y_test
