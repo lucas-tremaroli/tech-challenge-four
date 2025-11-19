@@ -4,6 +4,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
@@ -12,20 +13,18 @@ from sklearn.metrics import mean_squared_error
 class ModelService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.input_shape = (60, 12)  # timesteps, features (12 features from scaled data)
+        self.input_shape = (30, 12)  # timesteps, features (30 timesteps, 12 features from scaled data)
         self.output_units = 12  # output units matching number of features
 
     def build(self) -> Sequential:
         model = Sequential()
-        # Reduced complexity: 32 units instead of 50
-        model.add(LSTM(32, return_sequences=True, input_shape=self.input_shape,
-                      recurrent_regularizer=l2(0.01), kernel_regularizer=l2(0.01)))
-        model.add(Dropout(0.4))  # Increased dropout from 0.2 to 0.4
-        model.add(LSTM(32, return_sequences=False,
-                      recurrent_regularizer=l2(0.01), kernel_regularizer=l2(0.01)))
-        model.add(Dropout(0.4))
-        model.add(Dense(self.output_units, kernel_regularizer=l2(0.01)))
-        model.compile(optimizer="adam", loss="mean_squared_error", metrics=["mae"])
+        model.add(LSTM(16, input_shape=self.input_shape,
+                      recurrent_regularizer=l2(0.005), kernel_regularizer=l2(0.005)))
+        model.add(Dropout(0.3))
+        model.add(Dense(self.output_units, kernel_regularizer=l2(0.005)))
+
+        optimizer = Adam(learning_rate=0.001)
+        model.compile(optimizer=optimizer, loss="mean_squared_error", metrics=["mae"])
         model.summary()
         return model
 
@@ -33,7 +32,7 @@ class ModelService:
         # Early stopping to prevent overfitting
         early_stop = EarlyStopping(
             monitor='val_loss',
-            patience=10,
+            patience=7,
             restore_best_weights=True,
             verbose=1
         )
@@ -41,17 +40,17 @@ class ModelService:
         # Reduce learning rate when loss plateaus
         reduce_lr = ReduceLROnPlateau(
             monitor='val_loss',
-            factor=0.5,
-            patience=5,
-            min_lr=1e-7,
+            factor=0.2,
+            patience=3,
+            min_lr=1e-6,
             verbose=1
         )
 
         history = model.fit(
             X_train,
             y_train,
-            epochs=100,  # Increased epochs since early stopping will handle overfitting
-            batch_size=32,
+            epochs=50,  # Reduced epochs to prevent overfitting
+            batch_size=16,  # Smaller batch size for better gradient updates
             validation_split=0.2,
             shuffle=False, # Do not shuffle time series data
             callbacks=[early_stop, reduce_lr],
@@ -160,7 +159,7 @@ class ModelService:
         self.logger.info(f"Cross-validation MAE: {mean_mae:.6f} ± {std_mae:.6f}")
         return cv_scores
 
-    def check_data_leakage(self, X, y, lookback=60):
+    def check_data_leakage(self, X, y, lookback=30):
         """Check for potential data leakage issues"""
         self.logger.info("Checking for data leakage...")
 

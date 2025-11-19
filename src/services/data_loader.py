@@ -56,7 +56,7 @@ class DataLoaderService:
         data_scaled = scaler.fit_transform(data_clean)
         return data_scaled
 
-    def create_sequences(self, data_scaled: np.ndarray, lookback: int = 60):
+    def create_sequences(self, data_scaled: np.ndarray, lookback: int = 30):
         """
         Create sequences of data for time series forecasting.
         """
@@ -67,7 +67,7 @@ class DataLoaderService:
             y.append(data_scaled[i + lookback])
         return np.array(X), np.array(y)
 
-    def get_training_data(self, data_scaled: np.ndarray, lookback: int = 60):
+    def get_training_data(self, data_scaled: np.ndarray, lookback: int = 30):
         """
         Prepare training data for the model.
         """
