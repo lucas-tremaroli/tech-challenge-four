@@ -6,6 +6,7 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.regularizers import l2
 from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import mean_squared_error
 
 
 class ModelService:
@@ -62,7 +63,22 @@ class ModelService:
 
     def evaluate(self, model, X_test, y_test):
         evaluation = model.evaluate(X_test, y_test, verbose=1)
-        self.logger.info(f"Test Loss: {evaluation[0]}, Test MAE: {evaluation[1]}")
+
+        # Get predictions for additional metrics
+        predictions = model.predict(X_test, verbose=0)
+
+        # Calculate RMSE and MAPE
+        rmse = self.calculate_rmse(y_test, predictions)
+        mape = self.calculate_mape(y_test, predictions)
+
+        self.logger.info(f"Test Loss: {evaluation[0]:.6f}")
+        self.logger.info(f"Test MAE: {evaluation[1]:.6f}")
+        self.logger.info(f"Test RMSE: {rmse:.6f}")
+        self.logger.info(f"Test MAPE: {mape:.2f}%")
+
+        # Plot predictions vs actual
+        self._plot_predictions(y_test, predictions, rmse, mape)
+
         return evaluation
 
     def _plot_training_history(self, history):
@@ -86,7 +102,7 @@ class ModelService:
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig('../../assets/training_history.png')
+        plt.savefig('./assets/training_history.png')
         plt.show()
 
     def _check_overfitting(self, history):
@@ -125,7 +141,7 @@ class ModelService:
 
             # Build and train model for this fold
             model = self.build()
-            history = model.fit(
+            _ = model.fit(
                 X_train_cv, y_train_cv,
                 epochs=50, batch_size=32,
                 validation_data=(X_val_cv, y_val_cv),
@@ -176,65 +192,70 @@ class ModelService:
         self.logger.info("Data leakage check passed")
         return True
 
-    def augment_time_series_data(self, X, y, noise_factor=0.01, scaling_factor=0.1):
-        """Apply data augmentation techniques for time series"""
-        X_aug = []
-        y_aug = []
+    def calculate_rmse(self, y_true, y_pred):
+        """Calculate Root Mean Square Error"""
+        return np.sqrt(mean_squared_error(y_true, y_pred))
 
-        for i in range(len(X)):
-            # Original data
-            X_aug.append(X[i])
-            y_aug.append(y[i])
+    def calculate_mape(self, y_true, y_pred):
+        """Calculate Mean Absolute Percentage Error"""
+        # Avoid division by zero
+        mask = y_true != 0
+        if not np.any(mask):
+            return np.inf
+        return np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
 
-            # Add Gaussian noise
-            noise = np.random.normal(0, noise_factor, X[i].shape)
-            X_noise = X[i] + noise
-            X_aug.append(X_noise)
-            y_aug.append(y[i])
+    def _plot_predictions(self, y_test, predictions, rmse, mape):
+        """Plot predictions vs actual values with RMSE and MAPE metrics"""
+        plt.figure(figsize=(15, 10))
 
-            # Scaling (slight amplitude changes)
-            scale = 1 + np.random.uniform(-scaling_factor, scaling_factor)
-            X_scaled = X[i] * scale
-            y_scaled = y[i] * scale
-            X_aug.append(X_scaled)
-            y_aug.append(y_scaled)
+        # Since we have 12 features, plot the first few for visualization
+        features_to_plot = min(4, y_test.shape[1])
 
-        return np.array(X_aug), np.array(y_aug)
+        for i in range(features_to_plot):
+            plt.subplot(2, 2, i + 1)
 
-    def train_with_augmentation(self, model, X_train, y_train):
-        """Train model with data augmentation"""
-        self.logger.info("Training with data augmentation")
+            # Plot actual vs predicted for this feature
+            plt.plot(y_test[:100, i], label='Actual', alpha=0.7)
+            plt.plot(predictions[:100, i], label='Predicted', alpha=0.7)
 
-        # Apply augmentation
-        X_train_aug, y_train_aug = self.augment_time_series_data(X_train, y_train)
+            # Calculate metrics for this specific feature
+            feature_rmse = self.calculate_rmse(y_test[:, i], predictions[:, i])
+            feature_mape = self.calculate_mape(y_test[:, i], predictions[:, i])
 
-        # Early stopping and learning rate reduction
-        early_stop = EarlyStopping(
-            monitor='val_loss',
-            patience=15,  # More patience with augmented data
-            restore_best_weights=True,
-            verbose=1
-        )
+            plt.title(f'Feature {i+1}\nRMSE: {feature_rmse:.4f}, MAPE: {feature_mape:.2f}%')
+            plt.xlabel('Time Steps')
+            plt.ylabel('Scaled Values')
+            plt.legend()
+            plt.grid(True, alpha=0.3)
 
-        reduce_lr = ReduceLROnPlateau(
-            monitor='val_loss',
-            factor=0.5,
-            patience=7,
-            min_lr=1e-7,
-            verbose=1
-        )
+        plt.tight_layout()
+        plt.savefig('./assets/predictions_vs_actual.png', dpi=300, bbox_inches='tight')
+        plt.show()
 
-        history = model.fit(
-            X_train_aug,
-            y_train_aug,
-            epochs=100,
-            batch_size=32,
-            validation_split=0.2,
-            shuffle=False,
-            callbacks=[early_stop, reduce_lr],
-            verbose=1,
-        )
+        # Overall metrics plot
+        plt.figure(figsize=(12, 5))
 
-        self._plot_training_history(history)
-        self._check_overfitting(history)
-        return history
+        plt.subplot(1, 2, 1)
+        # Scatter plot of actual vs predicted (flattened)
+        y_flat = y_test.flatten()
+        pred_flat = predictions.flatten()
+        plt.scatter(y_flat, pred_flat, alpha=0.5, s=1)
+        plt.plot([y_flat.min(), y_flat.max()], [y_flat.min(), y_flat.max()], 'r--', lw=2)
+        plt.xlabel('Actual Values')
+        plt.ylabel('Predicted Values')
+        plt.title(f'Overall Predictions\nRMSE: {rmse:.4f}, MAPE: {mape:.2f}%')
+        plt.grid(True, alpha=0.3)
+
+        plt.subplot(1, 2, 2)
+        # Residuals plot
+        residuals = y_flat - pred_flat
+        plt.scatter(pred_flat, residuals, alpha=0.5, s=1)
+        plt.axhline(y=0, color='r', linestyle='--')
+        plt.xlabel('Predicted Values')
+        plt.ylabel('Residuals')
+        plt.title('Residuals Plot')
+        plt.grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        plt.savefig('./assets/model_metrics.png', dpi=300, bbox_inches='tight')
+        plt.show()
