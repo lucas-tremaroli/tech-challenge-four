@@ -36,4 +36,6 @@ if __name__ == "__main__":
 
     model_service.evaluate(lstm_model, X_test, y_test)
 
+    lstm_model.save("./models/lstm_model_final.keras")
+
     logger.info("Application finished")

@@ -75,5 +75,5 @@ class DataLoaderService:
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, shuffle=False
         )
-        self.logger.info(f"Training data shape: {X_train.shape}, Test data shape: {X_test.shape}")
+        self.logger.info("Data split into training and testing sets")
         return X_train, X_test, y_train, y_test
