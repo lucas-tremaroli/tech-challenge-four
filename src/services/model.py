@@ -101,8 +101,7 @@ class ModelService:
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig('./assets/training_history.png')
-        plt.show()
+        plt.savefig('./assets/plots/training_history.png')
 
     def _check_overfitting(self, history):
         """Check for signs of overfitting"""
@@ -228,8 +227,7 @@ class ModelService:
             plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('./assets/predictions_vs_actual.png', dpi=300, bbox_inches='tight')
-        plt.show()
+        plt.savefig('./assets/plots/predictions_vs_actual.png', dpi=300, bbox_inches='tight')
 
         # Overall metrics plot
         plt.figure(figsize=(12, 5))
@@ -256,5 +254,4 @@ class ModelService:
         plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('./assets/model_metrics.png', dpi=300, bbox_inches='tight')
-        plt.show()
+        plt.savefig('./assets/plots/model_metrics.png', dpi=300, bbox_inches='tight')
