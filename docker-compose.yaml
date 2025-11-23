@@ -1,0 +1,7 @@
+services:
+  api:
+    image: tech-challenge-four-api
+    container_name: tech-challenge-four-api
+    build: .
+    ports:
+      - "8000:8000"
