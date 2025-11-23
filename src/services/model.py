@@ -13,13 +13,22 @@ from sklearn.metrics import mean_squared_error
 class ModelService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.input_shape = (30, 12)  # timesteps, features (30 timesteps, 12 features from scaled data)
+        self.input_shape = (
+            30,
+            12,
+        )  # timesteps, features (30 timesteps, 12 features from scaled data)
         self.output_units = 12  # output units matching number of features
 
     def build(self) -> Sequential:
         model = Sequential()
-        model.add(LSTM(16, input_shape=self.input_shape,
-                      recurrent_regularizer=l2(0.005), kernel_regularizer=l2(0.005)))
+        model.add(
+            LSTM(
+                16,
+                input_shape=self.input_shape,
+                recurrent_regularizer=l2(0.005),
+                kernel_regularizer=l2(0.005),
+            )
+        )
         model.add(Dropout(0.3))
         model.add(Dense(self.output_units, kernel_regularizer=l2(0.005)))
 
@@ -31,19 +40,12 @@ class ModelService:
     def train(self, model, X_train, y_train):
         # Early stopping to prevent overfitting
         early_stop = EarlyStopping(
-            monitor='val_loss',
-            patience=7,
-            restore_best_weights=True,
-            verbose=1
+            monitor="val_loss", patience=7, restore_best_weights=True, verbose=1
         )
 
         # Reduce learning rate when loss plateaus
         reduce_lr = ReduceLROnPlateau(
-            monitor='val_loss',
-            factor=0.2,
-            patience=3,
-            min_lr=1e-6,
-            verbose=1
+            monitor="val_loss", factor=0.2, patience=3, min_lr=1e-6, verbose=1
         )
 
         history = model.fit(
@@ -52,7 +54,7 @@ class ModelService:
             epochs=50,  # Reduced epochs to prevent overfitting
             batch_size=16,  # Smaller batch size for better gradient updates
             validation_split=0.2,
-            shuffle=False, # Do not shuffle time series data
+            shuffle=False,  # Do not shuffle time series data
             callbacks=[early_stop, reduce_lr],
             verbose=1,
         )
@@ -85,28 +87,28 @@ class ModelService:
         plt.figure(figsize=(12, 4))
 
         plt.subplot(1, 2, 1)
-        plt.plot(history.history['loss'], label='Training Loss')
-        plt.plot(history.history['val_loss'], label='Validation Loss')
-        plt.title('Model Loss')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
+        plt.plot(history.history["loss"], label="Training Loss")
+        plt.plot(history.history["val_loss"], label="Validation Loss")
+        plt.title("Model Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
         plt.legend()
 
         plt.subplot(1, 2, 2)
-        plt.plot(history.history['mae'], label='Training MAE')
-        plt.plot(history.history['val_mae'], label='Validation MAE')
-        plt.title('Model MAE')
-        plt.xlabel('Epoch')
-        plt.ylabel('MAE')
+        plt.plot(history.history["mae"], label="Training MAE")
+        plt.plot(history.history["val_mae"], label="Validation MAE")
+        plt.title("Model MAE")
+        plt.xlabel("Epoch")
+        plt.ylabel("MAE")
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig('./assets/plots/training_history.png')
+        plt.savefig("./assets/plots/training_history.png")
 
     def _check_overfitting(self, history):
         """Check for signs of overfitting"""
-        val_loss = history.history['val_loss']
-        train_loss = history.history['loss']
+        val_loss = history.history["val_loss"]
+        train_loss = history.history["loss"]
 
         final_train_loss = train_loss[-1]
         final_val_loss = val_loss[-1]
@@ -140,10 +142,12 @@ class ModelService:
             # Build and train model for this fold
             model = self.build()
             _ = model.fit(
-                X_train_cv, y_train_cv,
-                epochs=50, batch_size=32,
+                X_train_cv,
+                y_train_cv,
+                epochs=50,
+                batch_size=32,
                 validation_data=(X_val_cv, y_val_cv),
-                verbose=0
+                verbose=0,
             )
 
             # Evaluate
@@ -168,7 +172,9 @@ class ModelService:
 
         # Basic check: ensure sequences are properly constructed
         if len(X) != len(y):
-            self.logger.error("X and y have different lengths - potential data preparation issue")
+            self.logger.error(
+                "X and y have different lengths - potential data preparation issue"
+            )
             return False
 
         # Check temporal order
@@ -213,21 +219,25 @@ class ModelService:
             plt.subplot(2, 2, i + 1)
 
             # Plot actual vs predicted for this feature
-            plt.plot(y_test[:100, i], label='Actual', alpha=0.7)
-            plt.plot(predictions[:100, i], label='Predicted', alpha=0.7)
+            plt.plot(y_test[:100, i], label="Actual", alpha=0.7)
+            plt.plot(predictions[:100, i], label="Predicted", alpha=0.7)
 
             # Calculate metrics for this specific feature
             feature_rmse = self.calculate_rmse(y_test[:, i], predictions[:, i])
             feature_mape = self.calculate_mape(y_test[:, i], predictions[:, i])
 
-            plt.title(f'Feature {i+1}\nRMSE: {feature_rmse:.4f}, MAPE: {feature_mape:.2f}%')
-            plt.xlabel('Time Steps')
-            plt.ylabel('Scaled Values')
+            plt.title(
+                f"Feature {i + 1}\nRMSE: {feature_rmse:.4f}, MAPE: {feature_mape:.2f}%"
+            )
+            plt.xlabel("Time Steps")
+            plt.ylabel("Scaled Values")
             plt.legend()
             plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('./assets/plots/predictions_vs_actual.png', dpi=300, bbox_inches='tight')
+        plt.savefig(
+            "./assets/plots/predictions_vs_actual.png", dpi=300, bbox_inches="tight"
+        )
 
         # Overall metrics plot
         plt.figure(figsize=(12, 5))
@@ -237,21 +247,23 @@ class ModelService:
         y_flat = y_test.flatten()
         pred_flat = predictions.flatten()
         plt.scatter(y_flat, pred_flat, alpha=0.5, s=1)
-        plt.plot([y_flat.min(), y_flat.max()], [y_flat.min(), y_flat.max()], 'r--', lw=2)
-        plt.xlabel('Actual Values')
-        plt.ylabel('Predicted Values')
-        plt.title(f'Overall Predictions\nRMSE: {rmse:.4f}, MAPE: {mape:.2f}%')
+        plt.plot(
+            [y_flat.min(), y_flat.max()], [y_flat.min(), y_flat.max()], "r--", lw=2
+        )
+        plt.xlabel("Actual Values")
+        plt.ylabel("Predicted Values")
+        plt.title(f"Overall Predictions\nRMSE: {rmse:.4f}, MAPE: {mape:.2f}%")
         plt.grid(True, alpha=0.3)
 
         plt.subplot(1, 2, 2)
         # Residuals plot
         residuals = y_flat - pred_flat
         plt.scatter(pred_flat, residuals, alpha=0.5, s=1)
-        plt.axhline(y=0, color='r', linestyle='--')
-        plt.xlabel('Predicted Values')
-        plt.ylabel('Residuals')
-        plt.title('Residuals Plot')
+        plt.axhline(y=0, color="r", linestyle="--")
+        plt.xlabel("Predicted Values")
+        plt.ylabel("Residuals")
+        plt.title("Residuals Plot")
         plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('./assets/plots/model_metrics.png', dpi=300, bbox_inches='tight')
+        plt.savefig("./assets/plots/model_metrics.png", dpi=300, bbox_inches="tight")

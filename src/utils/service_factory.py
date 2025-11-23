@@ -12,7 +12,9 @@ class ServiceFactory:
     def get_data_loader_service() -> DataLoaderService:
         if ServiceFactory._data_loader_service is None:
             technical_indicators = ServiceFactory.get_technical_indicators_service()
-            ServiceFactory._data_loader_service = DataLoaderService(technical_indicators)
+            ServiceFactory._data_loader_service = DataLoaderService(
+                technical_indicators
+            )
         return ServiceFactory._data_loader_service
 
     @staticmethod
