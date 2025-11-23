@@ -1,6 +1,6 @@
 import logging
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.layers import Input, LSTM, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 from src.services.interfaces.model_service import IModelBuilder
@@ -14,10 +14,10 @@ class LSTMModelBuilder(IModelBuilder):
 
     def build(self) -> Sequential:
         model = Sequential()
+        model.add(Input(shape=self.config.input_shape))
         model.add(
             LSTM(
                 self.config.lstm_units,
-                input_shape=self.config.input_shape,
                 recurrent_regularizer=l2(self.config.l2_regularization),
                 kernel_regularizer=l2(self.config.l2_regularization),
             )
