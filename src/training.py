@@ -1,6 +1,6 @@
 import logging
 
-from services.factory import ServiceFactory
+from src.utils.service_factory import ServiceFactory
 
 logging.basicConfig(
     level=logging.INFO,
