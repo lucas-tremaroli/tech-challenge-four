@@ -1,30 +1,56 @@
-from services.model import ModelService
-from services.data_loader import DataLoaderService
-from services.technical_indicators import TechnicalIndicatorsService
+from dependency_injector.wiring import Provide, inject
+from src.container import Container
+from src.services.interfaces.data_service import IDataFetcher, IDataRepository, IDataPreprocessor
+from src.services.interfaces.indicator_service import IIndicatorService
+from src.services.interfaces.model_service import IModelBuilder, IModelTrainer, IModelEvaluator
 
 
 class ServiceFactory:
-    _data_loader_service: DataLoaderService = None
-    _model_service: ModelService = None
-    _technical_indicators_service: TechnicalIndicatorsService = None
+    @staticmethod
+    @inject
+    def get_data_fetcher(
+        fetcher: IDataFetcher = Provide[Container.data_fetcher]
+    ) -> IDataFetcher:
+        return fetcher
 
     @staticmethod
-    def get_data_loader_service() -> DataLoaderService:
-        if ServiceFactory._data_loader_service is None:
-            technical_indicators = ServiceFactory.get_technical_indicators_service()
-            ServiceFactory._data_loader_service = DataLoaderService(
-                technical_indicators
-            )
-        return ServiceFactory._data_loader_service
+    @inject
+    def get_data_repository(
+        repository: IDataRepository = Provide[Container.data_repository]
+    ) -> IDataRepository:
+        return repository
 
     @staticmethod
-    def get_model_service() -> ModelService:
-        if ServiceFactory._model_service is None:
-            ServiceFactory._model_service = ModelService()
-        return ServiceFactory._model_service
+    @inject
+    def get_data_preprocessor(
+        preprocessor: IDataPreprocessor = Provide[Container.data_preprocessor]
+    ) -> IDataPreprocessor:
+        return preprocessor
 
     @staticmethod
-    def get_technical_indicators_service() -> TechnicalIndicatorsService:
-        if ServiceFactory._technical_indicators_service is None:
-            ServiceFactory._technical_indicators_service = TechnicalIndicatorsService()
-        return ServiceFactory._technical_indicators_service
+    @inject
+    def get_technical_indicators_service(
+        service: IIndicatorService = Provide[Container.technical_indicators_service]
+    ) -> IIndicatorService:
+        return service
+
+    @staticmethod
+    @inject
+    def get_model_builder(
+        builder: IModelBuilder = Provide[Container.model_builder]
+    ) -> IModelBuilder:
+        return builder
+
+    @staticmethod
+    @inject
+    def get_model_trainer(
+        trainer: IModelTrainer = Provide[Container.model_trainer]
+    ) -> IModelTrainer:
+        return trainer
+
+    @staticmethod
+    @inject
+    def get_model_evaluator(
+        evaluator: IModelEvaluator = Provide[Container.model_evaluator]
+    ) -> IModelEvaluator:
+        return evaluator
