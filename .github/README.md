@@ -16,4 +16,4 @@ This repository contains the code and documentation for the Tech Challenge Four 
     make up
     ```
 
-3. Access the application in your web browser at `http://localhost:3000`.
+3. Access the application in your web browser at `http://localhost:8000`.
