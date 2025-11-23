@@ -23,7 +23,9 @@ class IModelTrainer(ABC):
         pass
 
     @abstractmethod
-    def time_series_cross_validation(self, X: np.ndarray, y: np.ndarray, n_splits: int = 5) -> list:
+    def time_series_cross_validation(
+        self, X: np.ndarray, y: np.ndarray, n_splits: int = 5
+    ) -> list:
         pass
 
 
@@ -41,5 +43,7 @@ class IModelEvaluator(ABC):
         pass
 
     @abstractmethod
-    def check_data_leakage(self, X: np.ndarray, y: np.ndarray, lookback: int = 30) -> bool:
+    def check_data_leakage(
+        self, X: np.ndarray, y: np.ndarray, lookback: int = 30
+    ) -> bool:
         pass

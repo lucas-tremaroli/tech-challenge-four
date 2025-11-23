@@ -13,7 +13,7 @@ class ModelEvaluator(IModelEvaluator):
         self.logger = logging.getLogger(__name__)
         self.model_config = model_config
         self.plot_config = plot_config
-        
+
         Path(self.plot_config.plots_dir).mkdir(parents=True, exist_ok=True)
 
     def evaluate(self, model: Sequential, X_test: np.ndarray, y_test: np.ndarray):
@@ -42,16 +42,22 @@ class ModelEvaluator(IModelEvaluator):
             return np.inf
         return np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
 
-    def check_data_leakage(self, X: np.ndarray, y: np.ndarray, lookback: int = 30) -> bool:
+    def check_data_leakage(
+        self, X: np.ndarray, y: np.ndarray, lookback: int = 30
+    ) -> bool:
         self.logger.info("Checking for data leakage...")
 
         if len(X) != len(y):
-            self.logger.error("X and y have different lengths - potential data preparation issue")
+            self.logger.error(
+                "X and y have different lengths - potential data preparation issue"
+            )
             return False
 
         sequence_length = X.shape[1] if len(X.shape) > 1 else 1
         if sequence_length != lookback:
-            self.logger.warning(f"Sequence length ({sequence_length}) doesn't match lookback ({lookback})")
+            self.logger.warning(
+                f"Sequence length ({sequence_length}) doesn't match lookback ({lookback})"
+            )
 
         if np.any(np.isnan(X)) or np.any(np.isinf(X)):
             self.logger.error("Found NaN or infinite values in features")
@@ -84,7 +90,9 @@ class ModelEvaluator(IModelEvaluator):
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig(f"{self.plot_config.plots_dir}/{self.plot_config.training_history_filename}")
+        plt.savefig(
+            f"{self.plot_config.plots_dir}/{self.plot_config.training_history_filename}"
+        )
 
     def check_overfitting(self, history):
         val_loss = history.history["val_loss"]
@@ -106,7 +114,9 @@ class ModelEvaluator(IModelEvaluator):
                 "consider early stopping"
             )
 
-    def _plot_predictions(self, y_test: np.ndarray, predictions: np.ndarray, rmse: float, mape: float):
+    def _plot_predictions(
+        self, y_test: np.ndarray, predictions: np.ndarray, rmse: float, mape: float
+    ):
         plt.figure(figsize=(15, 10))
 
         features_to_plot = min(4, y_test.shape[1])
@@ -120,15 +130,20 @@ class ModelEvaluator(IModelEvaluator):
             feature_rmse = self.calculate_rmse(y_test[:, i], predictions[:, i])
             feature_mape = self.calculate_mape(y_test[:, i], predictions[:, i])
 
-            plt.title(f"Feature {i + 1}\nRMSE: {feature_rmse:.4f}, MAPE: {feature_mape:.2f}%")
+            plt.title(
+                f"Feature {i + 1}\nRMSE: {feature_rmse:.4f}, MAPE: {feature_mape:.2f}%"
+            )
             plt.xlabel("Time Steps")
             plt.ylabel("Scaled Values")
             plt.legend()
             plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig(f"{self.plot_config.plots_dir}/{self.plot_config.predictions_filename}", 
-                   dpi=self.plot_config.dpi, bbox_inches="tight")
+        plt.savefig(
+            f"{self.plot_config.plots_dir}/{self.plot_config.predictions_filename}",
+            dpi=self.plot_config.dpi,
+            bbox_inches="tight",
+        )
 
         plt.figure(figsize=(12, 5))
 
@@ -136,7 +151,9 @@ class ModelEvaluator(IModelEvaluator):
         y_flat = y_test.flatten()
         pred_flat = predictions.flatten()
         plt.scatter(y_flat, pred_flat, alpha=0.5, s=1)
-        plt.plot([y_flat.min(), y_flat.max()], [y_flat.min(), y_flat.max()], "r--", lw=2)
+        plt.plot(
+            [y_flat.min(), y_flat.max()], [y_flat.min(), y_flat.max()], "r--", lw=2
+        )
         plt.xlabel("Actual Values")
         plt.ylabel("Predicted Values")
         plt.title(f"Overall Predictions\nRMSE: {rmse:.4f}, MAPE: {mape:.2f}%")
@@ -152,5 +169,8 @@ class ModelEvaluator(IModelEvaluator):
         plt.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig(f"{self.plot_config.plots_dir}/{self.plot_config.metrics_filename}", 
-                   dpi=self.plot_config.dpi, bbox_inches="tight")
+        plt.savefig(
+            f"{self.plot_config.plots_dir}/{self.plot_config.metrics_filename}",
+            dpi=self.plot_config.dpi,
+            bbox_inches="tight",
+        )

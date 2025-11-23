@@ -23,7 +23,12 @@ class LSTMModelBuilder(IModelBuilder):
             )
         )
         model.add(Dropout(self.config.dropout_rate))
-        model.add(Dense(self.config.output_units, kernel_regularizer=l2(self.config.l2_regularization)))
+        model.add(
+            Dense(
+                self.config.output_units,
+                kernel_regularizer=l2(self.config.l2_regularization),
+            )
+        )
 
         optimizer = Adam(learning_rate=self.config.learning_rate)
         model.compile(optimizer=optimizer, loss="mean_squared_error", metrics=["mae"])

@@ -12,43 +12,31 @@ from src.services.ml.evaluator import ModelEvaluator
 
 
 class Container(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(modules=["src.utils.service_factory"])
-    
+    wiring_config = containers.WiringConfiguration(
+        modules=["src.utils.service_factory"]
+    )
+
     data_config = providers.Factory(DataConfig)
     model_config = providers.Factory(ModelConfig)
     plot_config = providers.Factory(PlotConfig)
     indicator_config = providers.Factory(IndicatorConfig)
-    
+
     data_fetcher = providers.Factory(YahooFinanceDataFetcher)
-    
-    data_repository = providers.Factory(
-        DuckDBRepository,
-        config=data_config
-    )
-    
-    data_preprocessor = providers.Factory(
-        DataPreprocessor,
-        config=data_config
-    )
-    
+
+    data_repository = providers.Factory(DuckDBRepository, config=data_config)
+
+    data_preprocessor = providers.Factory(DataPreprocessor, config=data_config)
+
     technical_indicators_service = providers.Factory(
-        TechnicalIndicatorsService,
-        config=indicator_config
+        TechnicalIndicatorsService, config=indicator_config
     )
-    
-    model_builder = providers.Factory(
-        LSTMModelBuilder,
-        config=model_config
-    )
-    
+
+    model_builder = providers.Factory(LSTMModelBuilder, config=model_config)
+
     model_trainer = providers.Factory(
-        ModelTrainer,
-        config=model_config,
-        model_builder=model_builder
+        ModelTrainer, config=model_config, model_builder=model_builder
     )
-    
+
     model_evaluator = providers.Factory(
-        ModelEvaluator,
-        model_config=model_config,
-        plot_config=plot_config
+        ModelEvaluator, model_config=model_config, plot_config=plot_config
     )

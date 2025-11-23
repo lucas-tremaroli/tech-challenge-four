@@ -9,7 +9,9 @@ class YahooFinanceDataFetcher(IDataFetcher):
         self.logger = logging.getLogger(__name__)
 
     def fetch_stock_data(self, ticker: str, period: str, interval: str) -> DataFrame:
-        self.logger.info(f"Fetching stock data for {ticker} with period {period} and interval {interval}")
+        self.logger.info(
+            f"Fetching stock data for {ticker} with period {period} and interval {interval}"
+        )
         try:
             stock = yf.Ticker(ticker)
             hist = stock.history(period=period, interval=interval)

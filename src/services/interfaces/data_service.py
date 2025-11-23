@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 import numpy as np
 import pandas as pd
 
@@ -26,9 +25,13 @@ class IDataPreprocessor(ABC):
         pass
 
     @abstractmethod
-    def create_sequences(self, data_scaled: np.ndarray, lookback: int) -> tuple[np.ndarray, np.ndarray]:
+    def create_sequences(
+        self, data_scaled: np.ndarray, lookback: int
+    ) -> tuple[np.ndarray, np.ndarray]:
         pass
 
     @abstractmethod
-    def prepare_training_data(self, data_scaled: np.ndarray, lookback: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def prepare_training_data(
+        self, data_scaled: np.ndarray, lookback: int
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         pass

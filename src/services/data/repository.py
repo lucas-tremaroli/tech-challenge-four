@@ -11,7 +11,9 @@ class DuckDBRepository(IDataRepository):
         self.config = config
 
     def load_data(self) -> DataFrame:
-        self.logger.info(f"Loading data from {self.config.db_file}, table: {self.config.db_table}")
+        self.logger.info(
+            f"Loading data from {self.config.db_file}, table: {self.config.db_table}"
+        )
         try:
             with duckdb.connect(self.config.db_file) as db_con:
                 data = db_con.table(self.config.db_table).to_df()
@@ -22,11 +24,15 @@ class DuckDBRepository(IDataRepository):
             raise
 
     def save_data(self, data: DataFrame) -> None:
-        self.logger.info(f"Saving {len(data)} records to {self.config.db_file}, table: {self.config.db_table}")
+        self.logger.info(
+            f"Saving {len(data)} records to {self.config.db_file}, table: {self.config.db_table}"
+        )
         try:
             with duckdb.connect(self.config.db_file) as db_con:
-                db_con.register('temp_df', data)
-                db_con.execute(f"CREATE OR REPLACE TABLE {self.config.db_table} AS SELECT * FROM temp_df")
+                db_con.register("temp_df", data)
+                db_con.execute(
+                    f"CREATE OR REPLACE TABLE {self.config.db_table} AS SELECT * FROM temp_df"
+                )
             self.logger.info("Data saved successfully")
         except Exception as e:
             self.logger.error(f"Failed to save data: {str(e)}")

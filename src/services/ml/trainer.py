@@ -15,18 +15,18 @@ class ModelTrainer(IModelTrainer):
 
     def train(self, model: Sequential, X_train: np.ndarray, y_train: np.ndarray):
         early_stop = EarlyStopping(
-            monitor="val_loss", 
-            patience=self.config.early_stopping_patience, 
-            restore_best_weights=True, 
-            verbose=1
+            monitor="val_loss",
+            patience=self.config.early_stopping_patience,
+            restore_best_weights=True,
+            verbose=1,
         )
 
         reduce_lr = ReduceLROnPlateau(
-            monitor="val_loss", 
-            factor=self.config.reduce_lr_factor, 
-            patience=self.config.reduce_lr_patience, 
-            min_lr=self.config.min_learning_rate, 
-            verbose=1
+            monitor="val_loss",
+            factor=self.config.reduce_lr_factor,
+            patience=self.config.reduce_lr_patience,
+            min_lr=self.config.min_learning_rate,
+            verbose=1,
         )
 
         history = model.fit(
@@ -41,10 +41,12 @@ class ModelTrainer(IModelTrainer):
         )
         return history
 
-    def time_series_cross_validation(self, X: np.ndarray, y: np.ndarray, n_splits: int = None) -> list:
+    def time_series_cross_validation(
+        self, X: np.ndarray, y: np.ndarray, n_splits: int = None
+    ) -> list:
         if n_splits is None:
             n_splits = self.config.cv_splits
-            
+
         tscv = TimeSeriesSplit(n_splits=n_splits)
         cv_scores = []
 
