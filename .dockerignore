@@ -1,0 +1,24 @@
+# Git
+.git
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+
+# Virtual environments
+venv
+.venv
+env
+
+# Environment files
+.env
+
+# IDE
+.vscode
+.idea
+
+# Docker files
+Dockerfile*
+docker-compose*
