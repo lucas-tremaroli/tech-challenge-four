@@ -9,6 +9,7 @@ from src.services.indicators.technical_indicators import TechnicalIndicatorsServ
 from src.services.ml.model_builder import LSTMModelBuilder
 from src.services.ml.trainer import ModelTrainer
 from src.services.ml.evaluator import ModelEvaluator
+from src.services.ml.predictor import ModelPredictor
 
 
 class Container(containers.DeclarativeContainer):
@@ -39,4 +40,8 @@ class Container(containers.DeclarativeContainer):
 
     model_evaluator = providers.Factory(
         ModelEvaluator, model_config=model_config, plot_config=plot_config
+    )
+
+    model_predictor = providers.Factory(
+        ModelPredictor, model_file_path="src/data/lstm_model_final.keras"
     )
