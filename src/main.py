@@ -10,16 +10,16 @@ def create_app() -> FastAPI:
         description="ML API for AAPL stock price predictions with monitoring",
         version="1.0.0"
     )
-    
+
     app.include_router(router)
-    
-    @app.get("/metrics")
+
+    @app.get("/metrics", tags=["monitoring"])
     async def metrics():
         return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
-    
+
     instrumentator = Instrumentator()
-    instrumentator.instrument(app).expose(app, endpoint="/prometheus")
-    
+    instrumentator.instrument(app).expose(app, endpoint="/prometheus", tags=["monitoring"])
+
     return app
 
 
