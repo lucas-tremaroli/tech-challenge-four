@@ -117,8 +117,3 @@ The API includes comprehensive monitoring with Prometheus metrics:
 - **Monitoring**: Automated overfitting detection and performance tracking
 - **API**: FastAPI endpoints for model inference with Prometheus metrics
 - **Production Monitoring**: Response time and resource usage
-
-## Dependencies
-
-**Core**: TensorFlow 2.20+, scikit-learn, pandas-ta, yfinance, FastAPI, DuckDB
-**Monitoring**: prometheus-client, prometheus-fastapi-instrumentator, psutil
