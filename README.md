@@ -80,14 +80,45 @@ cv_splits = 5 (time series cross-validation)
 
 3. Access the application in your web browser at `http://localhost:8000`.
 
+## API Endpoints
+
+- **`GET /api/health`** - Health check endpoint
+- **`POST /api/predict`** - Stock price prediction endpoint
+- **`GET /metrics`** - Prometheus metrics for monitoring
+- **`GET /prometheus`** - FastAPI instrumentator metrics
+
+## Monitoring & Metrics
+
+The API includes comprehensive monitoring with Prometheus metrics:
+
+### Available Metrics
+
+- **`prediction_requests_total`** - Total prediction requests (with success/error labels)
+- **`prediction_duration_seconds`** - End-to-end prediction response times
+- **`model_inference_duration_seconds`** - Model inference timing
+- **`prediction_steps_total`** - Number of prediction steps processed
+- **`prediction_sequence_length`** - Input sequence lengths
+- **`memory_usage_bytes`** - Current memory usage
+- **`cpu_usage_percent`** - CPU utilization
+- **`model_info`** - Model metadata and version information
+
+### Monitoring Setup
+
+1. **View Metrics**: Visit `http://localhost:8000/metrics`
+2. **Prometheus Integration**: Configure Prometheus to scrape the `/metrics` endpoint (future improvement)
+3. **Grafana Dashboards**: Create dashboards using the exposed metrics (future improvement)
+4. **Alerting**: Set up alerts on response times, error rates, and resource usage (future improvement)
+
 ## Key Features
 
 - **Time Series CV**: Proper temporal validation without data leakage
 - **Technical Indicators**: 12+ financial indicators for enhanced prediction
 - **Regularization**: Dropout and L2 to prevent overfitting
 - **Monitoring**: Automated overfitting detection and performance tracking
-- **API**: FastAPI endpoints for model inference
+- **API**: FastAPI endpoints for model inference with Prometheus metrics
+- **Production Monitoring**: Response time and resource usage
 
 ## Dependencies
 
-TensorFlow 2.20+, scikit-learn, pandas-ta, yfinance, FastAPI, DuckDB
+**Core**: TensorFlow 2.20+, scikit-learn, pandas-ta, yfinance, FastAPI, DuckDB
+**Monitoring**: prometheus-client, prometheus-fastapi-instrumentator, psutil
