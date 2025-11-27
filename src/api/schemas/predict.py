@@ -14,3 +14,8 @@ class DataPoint(BaseModel):
 class PredictionPayload(BaseModel):
     sequence: List[DataPoint]
     steps: int
+
+
+class PredictionResponse(BaseModel):
+    forecast_dates: List[str]
+    predictions: List[List[float]]
