@@ -7,6 +7,7 @@ from src.services.data.preprocessor import DataPreprocessor
 from src.config.data_config import DataConfig
 from src.services.indicators.technical_indicators import TechnicalIndicatorsService
 from src.config.app_config import IndicatorConfig
+from src.monitoring.metrics import track_model_inference, set_model_info
 
 
 class ModelPredictor:
@@ -15,6 +16,8 @@ class ModelPredictor:
         self.data_config = DataConfig()
         self.preprocessor = DataPreprocessor(self.data_config)
         self.indicators_service = TechnicalIndicatorsService(IndicatorConfig())
+        
+        set_model_info(model_file_path, "LSTM")
 
     def _payload_to_dataframe(self, data: PredictionPayload) -> pd.DataFrame:
         rows = []
@@ -59,7 +62,7 @@ class ModelPredictor:
         current_sequence = input_sequence.copy()
 
         for _ in range(data.steps):
-            next_prediction = self.model.predict(current_sequence, verbose=0)
+            next_prediction = self._model_predict(current_sequence)
             predictions.append(next_prediction[0])
 
             current_sequence = np.roll(current_sequence, -1, axis=1)
@@ -80,3 +83,7 @@ class ModelPredictor:
             "forecast_dates": forecast_dates,
             "predictions": predictions_original.tolist(),
         }
+
+    @track_model_inference
+    def _model_predict(self, sequence: np.ndarray) -> np.ndarray:
+        return self.model.predict(sequence, verbose=0)
