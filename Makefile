@@ -1,4 +1,4 @@
-.PHONY: help db lint format up down docker-build clean
+.PHONY: help db lint format up down payload docker-build clean
 
 help:
 	@echo "Available commands:"
@@ -7,6 +7,7 @@ help:
 	@echo "  make format        - Format the codebase using ruff"
 	@echo "  make up            - Start the Docker containers"
 	@echo "  make down          - Stop the Docker containers"
+	@echo "  make payload       - Generate payload data"
 	@echo "  make docker-build  - Build the Docker image for the API"
 	@echo "  make clean         - Remove __pycache__ directories"
 
@@ -24,6 +25,9 @@ up:
 
 down:
 	docker compose down
+
+payload:
+	uv run assets/payload.py
 
 docker-build:
 	docker build -t tech-challenge-four-api .
