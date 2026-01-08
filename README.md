@@ -2,6 +2,36 @@
 
 A machine learning application that uses LSTM neural networks to predict Apple (AAPL) stock prices with technical indicators.
 
+## Quick Start
+
+1. Install make
+
+    ```bash
+    brew install make
+    ```
+
+2. Run the following command to start the application:
+
+    ```bash
+    make up
+    ```
+
+3. Access the application in your web browser at `http://localhost:8000`.
+
+4. Copy the example payload from `assets/payload.json` and send a POST request to test stock price predictions:
+
+    ```bash
+    curl -X POST "http://localhost:8000/api/predict" \
+          -H "Content-Type: application/json" \
+          -d @assets/payload.json
+    ```
+
+5. Track system metrics and API performance through the following endpoints:
+
+    - Metrics Dashboard: `http://localhost:8000/metrics`
+    - Prometheus Metrics: `http://localhost:8000/prometheus`
+    - API Endpoints: `GET /metrics` and `GET /prometheus` for programmatic access
+
 ## Model Architecture
 
 **LSTM Neural Network** with the following structure:
@@ -63,22 +93,6 @@ cv_splits = 5 (time series cross-validation)
    - Test set evaluation
    - Training history plots
    - Prediction vs actual visualization
-
-## Quick Start
-
-1. Install make
-
-    ```bash
-    brew install make
-    ```
-
-2. Run the following command to start the application:
-
-    ```bash
-    make up
-    ```
-
-3. Access the application in your web browser at `http://localhost:8000`.
 
 ## API Endpoints
 
