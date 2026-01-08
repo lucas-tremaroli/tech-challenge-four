@@ -11,7 +11,7 @@ if __name__ == "__main__":
     sequence = []
     for date, row in hist.iterrows():
         sequence.append({
-            "date": date.strftime("%Y-%m-%d"),
+            "date": date.strftime("%Y-%m-%d"), # type: ignore
             "open": float(row["Open"]),
             "high": float(row["High"]),
             "low": float(row["Low"]),
