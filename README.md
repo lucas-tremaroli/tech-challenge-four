@@ -71,7 +71,7 @@ cv_splits = 5 (time series cross-validation)
 
 1. **Data Preparation**:
 
-   - Load AAPL stock data from SQLite database
+   - Load AAPL stock data from local database (duckdb)
    - Add technical indicators (SMA, EMA, RSI, MACD, Bollinger Bands, etc.)
    - Scale features using MinMaxScaler
    - Create sequences with 30-day lookback window
